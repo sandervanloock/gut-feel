@@ -1,15 +1,16 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import {initializeApp} from 'firebase/app';
+import {getAuth, GoogleAuthProvider} from 'firebase/auth';
+import {getFirestore} from 'firebase/firestore';
+import {getStorage} from 'firebase/storage';
 
-// Set these in .env.local:
+// Configure per environment in .env.development / .env.production:
 // VITE_FIREBASE_API_KEY=...
 // VITE_FIREBASE_AUTH_DOMAIN=...
 // VITE_FIREBASE_PROJECT_ID=...
-// VITE_FIREBASE_STORAGE_BUCKET=...
+// VITE_FIREBASE_STORAGE_BUCKET=...    (e.g. my-project-dev.firebasestorage.app)
 // VITE_FIREBASE_MESSAGING_SENDER_ID=...
 // VITE_FIREBASE_APP_ID=...
+// VITE_FIRESTORE_DATABASE=...         (named DB id; omit to use the default database)
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -21,7 +22,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE;
+
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = databaseId ? getFirestore(app, databaseId) : getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
