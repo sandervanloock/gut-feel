@@ -1,0 +1,44 @@
+/* Gut Feel — design tokens & base */
+:root {
+  /* Surfaces — warm cream */
+  --bg: oklch(96.5% 0.012 75);
+  --bg-2: oklch(93% 0.018 75);
+  --surface: oklch(99% 0.006 75);
+  --surface-2: oklch(97.5% 0.01 75);
+  --line: oklch(86% 0.018 75);
+  --line-2: oklch(91% 0.014 75);
+
+  /* Ink */
+  --ink: oklch(22% 0.014 60);
+  --ink-2: oklch(36% 0.014 60);
+  --muted: oklch(54% 0.014 60);
+  --faint: oklch(72% 0.014 60);
+
+  /* Accents */
+  --sage: oklch(58% 0.07 150);
+  --sage-2: oklch(68% 0.06 150);
+  --sage-soft: oklch(92% 0.035 150);
+  --terracotta: oklch(62% 0.11 45);
+  --terracotta-soft: oklch(93% 0.04 45);
+  --sand: oklch(88% 0.035 80);
+
+  /* Bristol scale */
+  --b1: oklch(70% 0.06 60);
+  --b2: oklch(72% 0.07 75);
+  --b3: oklch(74% 0.07 110);
+  --b4: oklch(64% 0.085 150);
+  --b5: oklch(70% 0.075 175);
+  --b6: oklch(68% 0.085 215);
+  --b7: oklch(66% 0.09 245);
+
+  /* Shape */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+
+  /* Type */
+  --serif: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+}
