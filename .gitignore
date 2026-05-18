@@ -3,3 +3,4 @@
 /.idea
 .env.local
 *.iml
+.env.*
