@@ -1,15 +1,12 @@
-import { useAuth } from './AuthContext.jsx';
+import {useAuth} from './AuthContext.jsx';
 
 export function LoginScreen() {
   const { signIn } = useAuth();
 
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      minHeight: '100vh', padding: 32, background: 'var(--bg)',
-    }}>
+      <div className="login-page">
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <div className="h-title" style={{ fontStyle: 'italic', fontSize: 40, marginBottom: 8 }}>
+        <div className="h-title login-title" style={{fontStyle: 'italic', marginBottom: 8}}>
           Gut Feel
         </div>
         <div style={{ color: 'var(--muted)', fontSize: 14, fontFamily: 'var(--mono)', letterSpacing: '0.04em' }}>
@@ -19,8 +16,7 @@ export function LoginScreen() {
 
       <button
         onClick={signIn}
-        className="btn btn-sage"
-        style={{ width: '100%', maxWidth: 280 }}
+        className="btn btn-sage login-btn"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="white" opacity="0.9"/>

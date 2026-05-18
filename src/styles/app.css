@@ -390,6 +390,26 @@ input, textarea { font: inherit; color: inherit; }
 .divider { height: 1px; background: var(--line-2); }
 .fade-in { animation: fadeIn 0.2s ease; }
 
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: clamp(24px, 8vw, 64px) 24px;
+    background: var(--bg);
+    width: 100%;
+}
+
+.login-title {
+    font-size: clamp(32px, 10vw, 52px);
+}
+
+.login-btn {
+    width: 100%;
+    max-width: 280px;
+}
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .field-error {
@@ -406,6 +426,24 @@ input, textarea { font: inherit; color: inherit; }
   border-radius: 12px;
   font-size: 13px;
   color: var(--terracotta);
+}
+
+/* Login page — desktop centering */
+@media (min-width: 900px) {
+    .login-page {
+        flex: 1;
+        min-height: 100vh;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .login-title {
+        font-size: 52px;
+    }
+
+    .login-btn {
+        max-width: 320px;
+    }
 }
 
 /* Brand block — hidden on mobile/tablet */
