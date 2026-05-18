@@ -10,6 +10,7 @@ import { DayStrip } from './components/DayStrip.jsx';
 import { TimelineRow } from './components/TimelineRow.jsx';
 import { InlineQuickAdd } from './components/InlineQuickAdd.jsx';
 import { DaySummary } from './components/DaySummary.jsx';
+import { InsightsScreen } from './components/InsightsScreen.jsx';
 import { LogMealSheet } from './sheets/LogMealSheet.jsx';
 import { LogGutSheet } from './sheets/LogGutSheet.jsx';
 import { SnackEditSheet } from './sheets/SnackEditSheet.jsx';
@@ -222,9 +223,9 @@ export function App() {
     <>
       <div className="scroll-area">
         {tab === 'today' && (
-          <>
+          <div className="today-page">
             {/* Header */}
-            <div style={{ padding: '20px 20px 14px' }}>
+            <div className="today-header" style={{ padding: '20px 20px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span className="eyebrow">{relativeDay(currentDate)}</span>
                 <div style={{ display: 'flex', gap: 4 }}>
@@ -246,88 +247,99 @@ export function App() {
             </div>
 
             {/* Day strip */}
-            <DayStrip currentDate={currentDate} setCurrentDate={setCurrentDate} entries={entries} />
+            <DayStrip className="today-daystrip" currentDate={currentDate} setCurrentDate={setCurrentDate} entries={entries} />
 
-            {/* Action buttons */}
-            <div style={{ padding: '14px 20px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <button className="btn btn-primary" onClick={() => setMealSheet({ open: true, initial: null })}>
-                <Icon name="utensils" size={18} color="currentColor" /> Log meal
-              </button>
-              <button className="btn btn-ghost" onClick={() => setBowelSheet({ open: true, initial: null })}>
-                <BlobShape n={4} size={20} /> Log gut
-              </button>
-            </div>
-
-            {/* Timeline */}
-            <div style={{ padding: '20px 20px 8px' }}>
-              <div className="eyebrow" style={{ marginBottom: 12 }}>Timeline</div>
-              {dayEntries.length === 0 ? (
-                <div className="empty">
-                  <div className="empty-icon"><Icon name="utensils" size={20} color="var(--muted)" /></div>
-                  <div style={{ fontFamily: 'var(--serif)', fontSize: 18, color: 'var(--ink)' }}>Nothing logged yet.</div>
-                  <div style={{ fontSize: 13, marginTop: 4 }}>Use the buttons above to start logging.</div>
-                  <div style={{ marginTop: 16 }}>
-                    <InlineQuickAdd open={openSlot === 'empty'} onToggle={() => setOpenSlot(openSlot === 'empty' ? null : 'empty')}
-                      onPick={(snack) => { addSnack(snack); setOpenSlot(null); }} snackCounts={snackCounts} />
-                  </div>
+            <div className="today-body">
+              <div className="today-main">
+                {/* Action buttons */}
+                <div className="today-actions" style={{ padding: '14px 20px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <button className="btn btn-primary" onClick={() => setMealSheet({ open: true, initial: null })}>
+                    <Icon name="utensils" size={18} color="currentColor" /> Log meal
+                  </button>
+                  <button className="btn btn-ghost" onClick={() => setBowelSheet({ open: true, initial: null })}>
+                    <BlobShape n={4} size={20} /> Log gut
+                  </button>
                 </div>
-              ) : (
-                <div style={{ position: 'relative' }}>
-                  <div className="rail" />
-                  {dayEntries.map((e, i) => {
-                    const next = dayEntries[i + 1];
-                    const isLast = i === dayEntries.length - 1;
-                    const showSlot = (next && next.type === 'meal') || isLast;
-                    return (
-                      <div key={e.id}>
-                        <TimelineRow entry={e} metaphor="blob"
-                          onEdit={() => {
-                            if (e.type === 'meal') setMealSheet({ open: true, initial: e });
-                            if (e.type === 'bowel') setBowelSheet({ open: true, initial: e });
-                            if (e.type === 'snack') setSnackSheet({ open: true, initial: e });
-                          }}
-                          onIncrementSnack={() => incrementEntry(e.id)}
-                          dragHandlers={dragHandlers}
-                          dragging={dragId}
-                          dragOver={dragOver}
-                        />
-                        {showSlot && (
-                          <InlineQuickAdd
-                            open={openSlot === i}
-                            onToggle={() => setOpenSlot(openSlot === i ? null : i)}
-                            onPick={(snack) => {
-                              const t = computeSlotTime(dayEntries, i);
-                              addSnackAt(snack, t);
-                              setOpenSlot(null);
-                            }}
-                            snackCounts={snackCounts}
-                          />
-                        )}
+
+                {/* Timeline */}
+                <div className="today-timeline" style={{ padding: '20px 20px 8px' }}>
+                  <div className="eyebrow" style={{ marginBottom: 12 }}>Timeline</div>
+                  {dayEntries.length === 0 ? (
+                    <div className="empty">
+                      <div className="empty-icon"><Icon name="utensils" size={20} color="var(--muted)" /></div>
+                      <div style={{ fontFamily: 'var(--serif)', fontSize: 18, color: 'var(--ink)' }}>Nothing logged yet.</div>
+                      <div style={{ fontSize: 13, marginTop: 4 }}>Use the buttons above to start logging.</div>
+                      <div style={{ marginTop: 16 }}>
+                        <InlineQuickAdd open={openSlot === 'empty'} onToggle={() => setOpenSlot(openSlot === 'empty' ? null : 'empty')}
+                          onPick={(snack) => { addSnack(snack); setOpenSlot(null); }} snackCounts={snackCounts} />
                       </div>
-                    );
-                  })}
+                    </div>
+                  ) : (
+                    <div style={{ position: 'relative' }}>
+                      <div className="rail" />
+                      {dayEntries.map((e, i) => {
+                        const next = dayEntries[i + 1];
+                        const isLast = i === dayEntries.length - 1;
+                        const showSlot = (next && next.type === 'meal') || isLast;
+                        return (
+                          <div key={e.id}>
+                            <TimelineRow entry={e} metaphor="blob"
+                              onEdit={() => {
+                                if (e.type === 'meal') setMealSheet({ open: true, initial: e });
+                                if (e.type === 'bowel') setBowelSheet({ open: true, initial: e });
+                                if (e.type === 'snack') setSnackSheet({ open: true, initial: e });
+                              }}
+                              onIncrementSnack={() => incrementEntry(e.id)}
+                              dragHandlers={dragHandlers}
+                              dragging={dragId}
+                              dragOver={dragOver}
+                            />
+                            {showSlot && (
+                              <InlineQuickAdd
+                                open={openSlot === i}
+                                onToggle={() => setOpenSlot(openSlot === i ? null : i)}
+                                onPick={(snack) => {
+                                  const t = computeSlotTime(dayEntries, i);
+                                  addSnackAt(snack, t);
+                                  setOpenSlot(null);
+                                }}
+                                snackCounts={snackCounts}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
+              {/* Day summary — bottom on mobile, sticky right rail on desktop */}
+              <div className="today-side">
+                <DaySummary entries={dayEntries} metaphor="blob" />
+              </div>
             </div>
 
-            <DaySummary entries={dayEntries} metaphor="blob" />
             <div style={{ height: 8 }} />
-          </>
+          </div>
         )}
 
         {tab === 'insights' && (
-          <div style={{ padding: '40px 24px', textAlign: 'center' }}>
-            <div className="empty-icon" style={{ margin: '0 auto 16px' }}>
-              <Icon name="chart" size={22} color="var(--muted)" />
-            </div>
-            <div style={{ fontFamily: 'var(--serif)', fontSize: 22, marginBottom: 8 }}>Insights</div>
-            <div style={{ color: 'var(--muted)', fontSize: 14 }}>Coming in a future update.</div>
-          </div>
+          <InsightsScreen entries={entries} metaphor="blob" />
         )}
       </div>
 
-      {/* Tab bar */}
-      <div className="tabbar">
+      {/* Tab bar / sidebar nav */}
+      <nav className="tabbar">
+        <div className="nav-brand" aria-hidden="true">
+          <div className="nav-brand-mark">
+            <BlobShape n={4} size={28} />
+          </div>
+          <div className="nav-brand-text">
+            <div className="nav-brand-name">Gut Feel</div>
+            <div className="nav-brand-sub">a quiet food + flow journal</div>
+          </div>
+        </div>
         <button className={tab === 'today' ? 'active' : ''} onClick={() => setTab('today')}>
           <span className="tab-icon"><Icon name="home" size={22} /></span>
           <span>Today</span>
@@ -336,7 +348,7 @@ export function App() {
           <span className="tab-icon"><Icon name="chart" size={22} /></span>
           <span>Insights</span>
         </button>
-      </div>
+      </nav>
 
       {/* Sheets */}
       <LogMealSheet

@@ -15,7 +15,7 @@ export function DaySummary({ entries, metaphor }) {
 
   return (
     <div style={{ padding: '14px 20px 24px' }}>
-      <div className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="card today-summary-card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
         <div style={{ flex: 1 }}>
           <div className="eyebrow" style={{ marginBottom: 4 }}>Today's gut</div>
           <div style={{ fontFamily: 'var(--serif)', fontSize: 20, lineHeight: 1.15, letterSpacing: '-0.01em' }}>

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { addDays, dayKey, TODAY } from '../data.js';
 
-export function DayStrip({ currentDate, setCurrentDate, entries }) {
+export function DayStrip({ currentDate, setCurrentDate, entries, className }) {
   const daystripRef = useRef(null);
   const dKey = dayKey(currentDate);
 
@@ -24,7 +24,7 @@ export function DayStrip({ currentDate, setCurrentDate, entries }) {
   }, [dKey]);
 
   return (
-    <div className="daystrip" ref={daystripRef}>
+    <div className={`daystrip${className ? ' ' + className : ''}`} ref={daystripRef}>
       {stripDays.map(d => {
         const k = dayKey(d);
         const isSel = k === dKey;

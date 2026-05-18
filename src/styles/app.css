@@ -31,7 +31,7 @@ input, textarea { font: inherit; color: inherit; }
   min-height: 100vh;
   box-shadow: 0 0 0 1px var(--line-2);
 }
-@media (min-width: 600px) {
+@media (min-width: 600px) and (max-width: 899px) {
   body { padding: 32px 24px; align-items: flex-start; background: oklch(97% 0.005 75); }
   #app-root {
     margin: 0 auto;
@@ -406,4 +406,207 @@ input, textarea { font: inherit; color: inherit; }
   border-radius: 12px;
   font-size: 13px;
   color: var(--terracotta);
+}
+
+/* Brand block — hidden on mobile/tablet */
+.nav-brand { display: none; }
+
+/* Page containers — transparent to layout on mobile */
+.today-page, .insights-page { display: contents; }
+
+/* ── Desktop shell (≥ 900px) ───────────────────────────────── */
+@media (min-width: 900px) {
+  body {
+    display: block;
+    padding: 0;
+    background: var(--bg);
+    min-height: 100vh;
+  }
+  #app-root {
+    flex-direction: row-reverse;
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    box-shadow: none;
+    border-radius: 0;
+    background: var(--bg);
+  }
+
+  .scroll-area {
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .tabbar {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 240px;
+    flex-shrink: 0;
+    border-top: 0;
+    border-right: 0.5px solid var(--line-2);
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 28px 16px 24px;
+    gap: 2px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .tabbar button {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: var(--ink-2);
+    border-radius: 10px;
+  }
+  .tabbar button:hover { background: var(--surface-2); color: var(--ink); }
+  .tabbar button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 0 0 0.5px var(--line-2);
+  }
+  .tabbar button .tab-icon { width: 22px; }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 8px 22px;
+    margin-bottom: 8px;
+    border-bottom: 0.5px solid var(--line-2);
+  }
+  .nav-brand-mark {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 0.5px solid var(--line-2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-brand-text { min-width: 0; }
+  .nav-brand-name {
+    font-family: var(--serif);
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .nav-brand-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-top: 5px;
+    line-height: 1.2;
+  }
+
+  /* Today page — header + daystrip full width, body two-column */
+  .today-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 8px 24px 24px;
+    box-sizing: border-box;
+  }
+  .today-header { padding: 28px 0 16px !important; }
+  .today-header .h-title { font-size: 44px; }
+  .today-daystrip { padding: 4px 0 4px !important; }
+  .today-daystrip .daydot { width: 56px; padding: 10px 0; }
+  .today-daystrip .daydot .dnum { font-size: 26px; }
+
+  .today-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: 28px;
+    align-items: start;
+    margin-top: 16px;
+  }
+  .today-main, .today-side { min-width: 0; }
+  .today-actions { padding: 0 0 4px !important; }
+  .today-timeline { padding: 16px 0 8px !important; }
+  .today-side { padding: 0 !important; }
+  .today-side .today-summary-card {
+    position: sticky;
+    top: 24px;
+    padding: 22px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 18px !important;
+    text-align: left;
+  }
+
+  /* Insights page — header full width, cards in 12-col grid */
+  .insights-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 8px 24px 32px;
+    box-sizing: border-box;
+  }
+  .insights-header { padding: 28px 0 8px !important; }
+  .insights-header .h-title { font-size: 44px; }
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 16px;
+  }
+  .insights-cell { padding: 0 !important; }
+  .insights-cell--avg      { grid-column: span 6; }
+  .insights-cell--dist     { grid-column: span 6; }
+  .insights-cell--daily    { grid-column: span 6; }
+  .insights-cell--patterns { grid-column: span 6; }
+  .insights-cell--top      { grid-column: span 12; }
+  .insights-cell .card { height: 100%; }
+
+  /* Sheets become centered modals */
+  .sheet-backdrop { position: fixed; }
+  .sheet {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: min(560px, calc(100vw - 48px));
+    max-height: min(820px, calc(100vh - 64px));
+    border-radius: 24px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 30px 80px -20px rgba(40,30,15,0.32),
+      0 0 0 0.5px var(--line-2);
+    animation: sheetPop 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .sheet-handle { display: none; }
+  @keyframes sheetPop {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+}
+
+@media (min-width: 1200px) {
+  .insights-cell--avg      { grid-column: span 4; }
+  .insights-cell--dist     { grid-column: span 4; }
+  .insights-cell--daily    { grid-column: span 4; }
+  .insights-cell--patterns { grid-column: span 7; }
+  .insights-cell--top      { grid-column: span 5; }
+}
+
+@media (min-width: 1400px) {
+  body { background: oklch(97% 0.005 75); }
 }
