@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import {
-  collection, query, where, onSnapshot,
-  addDoc, updateDoc, deleteDoc, doc, serverTimestamp,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
-import { db } from '../config/firebase.js';
+import {db} from '../config/firebase.js';
 
 export function useEntries(uid, dateStr) {
   const [entries, setEntries] = useState([]);
@@ -44,8 +52,12 @@ export function useAllEntries(uid) {
 
   useEffect(() => {
     if (!uid) { setEntries([]); setLoading(false); return; }
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
     const ref = collection(db, 'users', uid, 'entries');
-    const unsub = onSnapshot(ref, (snap) => {
+    const q = query(ref, where('date', '>=', cutoffStr), orderBy('date', 'desc'));
+    const unsub = onSnapshot(q, (snap) => {
       setEntries(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       setLoading(false);
     });
