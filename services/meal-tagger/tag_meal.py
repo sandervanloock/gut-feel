@@ -29,13 +29,20 @@ def tag_meal(doc_data: dict, uid: str, eid: str, db) -> dict | None:
     input_hash = compute_input_hash(name, ingredients, followup_answers)
 
     existing = doc_data.get("analysis", {})
-    # Skip if we already processed this exact input (same hash, non-pending result).
-    # This breaks the Eventarc re-fire loop caused by our own write-back.
-    if (
-            existing.get("inputHash") == input_hash
-            and existing.get("status") in ("ready", "needs-input")
-    ):
-        print(f"skip: hash match ({existing.get('status')}) for {uid}/{eid}")
+
+    # Primary guard: only run if the client explicitly requested analysis
+    # by setting analysisRequestedAt. Drop/restore tag writes don't touch
+    # this field, so they never trigger a re-run.
+    analysis_requested_at = doc_data.get("analysisRequestedAt")
+    if not analysis_requested_at:
+        print(f"skip: no analysisRequestedAt for {uid}/{eid}")
+        return None
+
+    # Secondary guard: skip if we already processed this exact request
+    # (Cloud Run's own write-back re-fires Eventarc; this breaks the loop).
+    processed_request_at = existing.get("processedRequestAt")
+    if processed_request_at and processed_request_at == analysis_requested_at:
+        print(f"skip: already processed this request for {uid}/{eid}")
         return None
 
     try:
@@ -63,6 +70,7 @@ def tag_meal(doc_data: dict, uid: str, eid: str, db) -> dict | None:
             "inputHash": input_hash,
             "model": MODEL,
             "version": 1,
+            "processedRequestAt": analysis_requested_at,
             "updatedAt": firestore.SERVER_TIMESTAMP,
         }
     except Exception as e:
@@ -119,6 +127,7 @@ def tag_meal(doc_data: dict, uid: str, eid: str, db) -> dict | None:
             "inputHash": input_hash,
             "model": MODEL,
             "version": 1,
+            "processedRequestAt": analysis_requested_at,
             "updatedAt": firestore.SERVER_TIMESTAMP,
         }
 
