@@ -191,16 +191,15 @@ export function LogMealSheet({
         />
       </div>
 
-        {liveAnalysis && (
-            <div style={{marginBottom: 14}}>
-                <NutritionPanel
-                    analysis={liveAnalysis}
-                    onAnswerFollowup={onAnswerFollowup}
-                    onDropTag={onDropTag}
-                    onRestoreTags={onRestoreTags}
-                />
-            </div>
-        )}
+        <div style={{marginBottom: 14}}>
+            <NutritionPanel
+                analysis={liveAnalysis}
+                isNew={!initial && !liveAnalysis}
+                onAnswerFollowup={onAnswerFollowup}
+                onDropTag={onDropTag}
+                onRestoreTags={onRestoreTags}
+            />
+        </div>
 
       {initial && (
         <button

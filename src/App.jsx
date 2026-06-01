@@ -133,6 +133,7 @@ export function App() {
   const answerFollowup = useCallback(async (entryId, followupId, answer) => {
     await updateDoc(doc(db, 'users', uid, 'entries', entryId), {
       [`analysis.followupAnswers.${followupId}`]: answer,
+      'analysis.status': 'pending',
       analysisRequestedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
