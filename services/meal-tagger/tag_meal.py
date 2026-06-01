@@ -29,11 +29,13 @@ def tag_meal(doc_data: dict, uid: str, eid: str, db) -> dict | None:
     input_hash = compute_input_hash(name, ingredients, followup_answers)
 
     existing = doc_data.get("analysis", {})
+    # Skip if we already processed this exact input (same hash, non-pending result).
+    # This breaks the Eventarc re-fire loop caused by our own write-back.
     if (
             existing.get("inputHash") == input_hash
-            and existing.get("status") == "ready"
+            and existing.get("status") in ("ready", "needs-input")
     ):
-        print(f"skip: hash match for {uid}/{eid}")
+        print(f"skip: hash match ({existing.get('status')}) for {uid}/{eid}")
         return None
 
     try:

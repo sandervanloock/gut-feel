@@ -871,3 +871,13 @@ input, textarea { font: inherit; color: inherit; }
     padding: 0;
     flex-shrink: 0;
 }
+
+.chip--selected {
+  background: var(--sage-soft);
+  border-color: var(--sage);
+  color: var(--sage);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+}
