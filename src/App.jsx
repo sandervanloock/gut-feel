@@ -95,14 +95,65 @@ export function App() {
     }
 
     const data = { type: 'meal', date: dKey, name, ingredients, time, mealType, notes: notes || '', ...(photoUrl ? { photoUrl } : {}) };
+    const pendingAnalysis = {
+      status: 'pending',
+      nutrition: null,
+      followup: null,
+      followupAnswers: {},
+      dropped: [],
+      inputHash: '',
+      model: '',
+      version: 1
+    };
 
     if (mealSheet.initial) {
-      await updateDoc(doc(db, 'users', uid, 'entries', mealSheet.initial.id), { ...data, updatedAt: serverTimestamp() });
+      const prevAnalysis = mealSheet.initial.analysis ?? {};
+      await updateDoc(doc(db, 'users', uid, 'entries', mealSheet.initial.id), {
+        ...data,
+        analysis: {
+          ...pendingAnalysis,
+          followupAnswers: prevAnalysis.followupAnswers ?? {},
+          dropped: prevAnalysis.dropped ?? []
+        },
+        analysisRequestedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
     } else {
-      await addDoc(entriesRef(), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      await addDoc(entriesRef(), {
+        ...data,
+        analysis: pendingAnalysis,
+        analysisRequestedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
     }
     setMealSheet({ open: false, initial: null });
   }, [uid, dKey, mealSheet.initial]);
+
+  const answerFollowup = useCallback(async (entryId, followupId, answer) => {
+    await updateDoc(doc(db, 'users', uid, 'entries', entryId), {
+      [`analysis.followupAnswers.${followupId}`]: answer,
+      analysisRequestedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  }, [uid]);
+
+  const dropTag = useCallback(async (entryId, tagKey) => {
+    const entry = entries.find(e => e.id === entryId);
+    const dropped = entry?.analysis?.dropped ?? [];
+    if (dropped.includes(tagKey)) return;
+    await updateDoc(doc(db, 'users', uid, 'entries', entryId), {
+      'analysis.dropped': [...dropped, tagKey],
+      updatedAt: serverTimestamp(),
+    });
+  }, [uid, entries]);
+
+  const restoreTags = useCallback(async (entryId) => {
+    await updateDoc(doc(db, 'users', uid, 'entries', entryId), {
+      'analysis.dropped': [],
+      updatedAt: serverTimestamp(),
+    });
+  }, [uid]);
 
   const saveBowel = useCallback(async ({ bristol, urgency, effort, time }) => {
     const data = { type: 'bowel', date: dKey, bristol, urgency, effort, time };
@@ -366,11 +417,15 @@ export function App() {
       <LogMealSheet
         open={mealSheet.open}
         initial={mealSheet.initial}
+        liveAnalysis={mealSheet.initial ? (entries.find(e => e.id === mealSheet.initial.id)?.analysis ?? mealSheet.initial.analysis) : null}
         onClose={() => setMealSheet({ open: false, initial: null })}
         onSave={saveMeal}
         onDelete={deleteEntry}
         ingredientHistory={ingredientHistory}
         recentMeals={recentMeals}
+        onAnswerFollowup={(followupId, answer) => mealSheet.initial && answerFollowup(mealSheet.initial.id, followupId, answer)}
+        onDropTag={(tagKey) => mealSheet.initial && dropTag(mealSheet.initial.id, tagKey)}
+        onRestoreTags={() => mealSheet.initial && restoreTags(mealSheet.initial.id)}
       />
       <LogGutSheet
         open={bowelSheet.open}

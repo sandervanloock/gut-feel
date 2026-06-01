@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { BottomSheet } from '../components/BottomSheet.jsx';
-import { PhotoUpload } from '../components/PhotoUpload.jsx';
-import { IngredientInput } from '../components/IngredientInput.jsx';
-import { Icon } from '../components/Icon.jsx';
+import {useEffect, useState} from 'react';
+import {BottomSheet} from '../components/BottomSheet.jsx';
+import {PhotoUpload} from '../components/PhotoUpload.jsx';
+import {IngredientInput} from '../components/IngredientInput.jsx';
+import {Icon} from '../components/Icon.jsx';
+import {NutritionPanel} from '../components/NutritionPanel.jsx';
 
 function defaultTimeForMeal(type) {
   const h = new Date().getHours();
@@ -14,7 +15,19 @@ function defaultTimeForMeal(type) {
   }
 }
 
-export function LogMealSheet({ open, initial, onClose, onSave, onDelete, ingredientHistory, recentMeals }) {
+export function LogMealSheet({
+                                 open,
+                                 initial,
+                                 liveAnalysis,
+                                 onClose,
+                                 onSave,
+                                 onDelete,
+                                 ingredientHistory,
+                                 recentMeals,
+                                 onAnswerFollowup,
+                                 onDropTag,
+                                 onRestoreTags
+                             }) {
   const [name, setName] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [time, setTime] = useState('12:00');
@@ -177,6 +190,17 @@ export function LogMealSheet({ open, initial, onClose, onSave, onDelete, ingredi
           rows={3} style={{ resize: 'vertical', minHeight: 64, fontFamily: 'inherit', lineHeight: 1.4 }}
         />
       </div>
+
+        {liveAnalysis && (
+            <div style={{marginBottom: 14}}>
+                <NutritionPanel
+                    analysis={liveAnalysis}
+                    onAnswerFollowup={onAnswerFollowup}
+                    onDropTag={onDropTag}
+                    onRestoreTags={onRestoreTags}
+                />
+            </div>
+        )}
 
       {initial && (
         <button

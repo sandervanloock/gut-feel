@@ -82,27 +82,93 @@ db.settings({ignoreUndefinedProperties: true});
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'other'];
 const MEAL_TIMES = {breakfast: '08:30', lunch: '12:15', dinner: '18:45', other: '15:00'};
 
+function makeAnalysis(kcal, protein, carbs, fat, fiber, sugar, sodium, confLevel = 'med') {
+    return {
+        status: 'ready',
+        nutrition: {
+            kcal,
+            macros: {protein, carbs, fat},
+            fiber,
+            sugar,
+            sodium,
+            vitamins: [],
+            conf: {
+                calories: confLevel,
+                protein: confLevel,
+                carbs: confLevel,
+                fat: confLevel,
+                fiber: confLevel,
+                sugar: confLevel,
+                sodium: confLevel,
+                vitamins: 'low',
+            },
+            knownRatio: confLevel === 'high' ? 0.95 : 0.75,
+        },
+        followup: null,
+        followupAnswers: {},
+        dropped: [],
+        inputHash: 'seed',
+        model: 'seed',
+        version: 1,
+        updatedAt: now(),
+    };
+}
+
 const MEALS = [
-    {name: 'Avocado toast', mealType: 'breakfast', ingredients: ['sourdough', 'avocado', 'eggs', 'tomato']},
+    {
+        name: 'Avocado toast', mealType: 'breakfast', ingredients: ['sourdough', 'avocado', 'eggs', 'tomato'],
+        analysis: makeAnalysis(420, 18, 38, 22, 8, 4, 480, 'high')
+    },
     {
         name: 'Greek yogurt with granola',
         mealType: 'breakfast',
-        ingredients: ['yogurt', 'granola', 'blueberries', 'honey']
+        ingredients: ['yogurt', 'granola', 'blueberries', 'honey'],
+        analysis: makeAnalysis(340, 15, 52, 9, 4, 28, 120, 'high'),
     },
-    {name: 'Oatmeal with banana', mealType: 'breakfast', ingredients: ['oats', 'banana', 'almond milk', 'cinnamon']},
-    {name: 'Chicken salad', mealType: 'lunch', ingredients: ['chicken', 'romaine', 'tomato', 'cucumber', 'olive oil']},
-    {name: 'Lentil soup', mealType: 'lunch', ingredients: ['lentils', 'onion', 'garlic', 'carrot', 'spinach']},
-    {name: 'Quinoa bowl', mealType: 'lunch', ingredients: ['quinoa', 'chickpeas', 'pepper', 'feta', 'lemon']},
+    {
+        name: 'Oatmeal with banana', mealType: 'breakfast', ingredients: ['oats', 'banana', 'almond milk', 'cinnamon'],
+        analysis: makeAnalysis(310, 8, 58, 6, 7, 18, 80, 'high')
+    },
+    {
+        name: 'Chicken salad',
+        mealType: 'lunch',
+        ingredients: ['chicken', 'romaine', 'tomato', 'cucumber', 'olive oil'],
+        analysis: makeAnalysis(380, 34, 12, 22, 4, 6, 310, 'high')
+    },
+    {
+        name: 'Lentil soup', mealType: 'lunch', ingredients: ['lentils', 'onion', 'garlic', 'carrot', 'spinach'],
+        analysis: makeAnalysis(280, 18, 44, 4, 14, 8, 620, 'med')
+    },
+    {
+        name: 'Quinoa bowl', mealType: 'lunch', ingredients: ['quinoa', 'chickpeas', 'pepper', 'feta', 'lemon'],
+        analysis: makeAnalysis(420, 19, 54, 14, 9, 7, 480, 'med')
+    },
     {
         name: 'Pasta with tomato sauce',
         mealType: 'dinner',
-        ingredients: ['pasta', 'tomato', 'garlic', 'olive oil', 'parmesan']
+        ingredients: ['pasta', 'tomato', 'garlic', 'olive oil', 'parmesan'],
+        analysis: makeAnalysis(520, 18, 72, 16, 5, 9, 540, 'med'),
     },
-    {name: 'Salmon with rice', mealType: 'dinner', ingredients: ['salmon', 'rice', 'broccoli', 'soy sauce', 'lemon']},
-    {name: 'Stir-fry tofu', mealType: 'dinner', ingredients: ['tofu', 'noodles', 'pepper', 'onion', 'soy sauce']},
-    {name: 'Beef tacos', mealType: 'dinner', ingredients: ['beef', 'tortilla', 'lettuce', 'tomato', 'cheese']},
-    {name: 'Coffee', mealType: 'other', ingredients: []},
-    {name: 'Fruit bowl', mealType: 'other', ingredients: ['apple', 'orange', 'strawberry', 'blueberries']},
+    {
+        name: 'Salmon with rice', mealType: 'dinner', ingredients: ['salmon', 'rice', 'broccoli', 'soy sauce', 'lemon'],
+        analysis: makeAnalysis(490, 38, 48, 14, 4, 4, 820, 'high')
+    },
+    {
+        name: 'Stir-fry tofu', mealType: 'dinner', ingredients: ['tofu', 'noodles', 'pepper', 'onion', 'soy sauce'],
+        analysis: makeAnalysis(410, 22, 52, 12, 5, 8, 920, 'med')
+    },
+    {
+        name: 'Beef tacos', mealType: 'dinner', ingredients: ['beef', 'tortilla', 'lettuce', 'tomato', 'cheese'],
+        analysis: makeAnalysis(560, 32, 38, 28, 4, 6, 740, 'med')
+    },
+    {
+        name: 'Coffee', mealType: 'other', ingredients: [],
+        analysis: makeAnalysis(5, 0, 1, 0, 0, 0, 5, 'high')
+    },
+    {
+        name: 'Fruit bowl', mealType: 'other', ingredients: ['apple', 'orange', 'strawberry', 'blueberries'],
+        analysis: makeAnalysis(180, 2, 44, 1, 7, 34, 10, 'high')
+    },
 ];
 
 const NOTES_POOL = [
@@ -170,6 +236,8 @@ async function seed() {
                 time: MEAL_TIMES[meal.mealType],
                 notes: pick(NOTES_POOL),
                 photoUrl: null,
+                analysis: meal.analysis ?? null,
+                analysisRequestedAt: now(),
                 createdAt: now(),
                 updatedAt: now(),
             });

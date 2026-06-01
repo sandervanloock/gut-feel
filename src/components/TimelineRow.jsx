@@ -1,7 +1,8 @@
-import { Icon, SnackIcon } from './Icon.jsx';
-import { BlobShape } from './BlobShape.jsx';
-import { Tag } from './Tag.jsx';
-import { BRISTOL_LABELS, fmtTime } from '../data.js';
+import {Icon, SnackIcon} from './Icon.jsx';
+import {BlobShape} from './BlobShape.jsx';
+import {Tag} from './Tag.jsx';
+import {MealAnalysisStrip} from './MealAnalysisStrip.jsx';
+import {BRISTOL_LABELS, fmtTime} from '../data.js';
 
 export function TimelineRow({ entry, metaphor, onEdit, onIncrementSnack, dragHandlers, dragOver, dragging }) {
   const dotStyle = {
@@ -53,6 +54,11 @@ export function TimelineRow({ entry, metaphor, onEdit, onIncrementSnack, dragHan
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
               {(entry.ingredients || []).map((s, i) => <Tag key={i}>{s}</Tag>)}
             </div>
+              {entry.analysis && (
+                  <div style={{marginTop: 8}}>
+                      <MealAnalysisStrip analysis={entry.analysis}/>
+                  </div>
+              )}
             {entry.notes && (
               <div style={{ marginTop: 8, paddingTop: 8, borderTop: '0.5px solid var(--line-2)', display: 'flex', gap: 6, fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>
                 <Icon name="note" size={12} color="var(--faint)" />
