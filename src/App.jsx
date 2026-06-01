@@ -1,21 +1,20 @@
-import { useState, useMemo, useCallback } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { signOut } from 'firebase/auth';
-import { useAuth } from './auth/AuthContext.jsx';
-import { useAllEntries } from './hooks/useEntries.js';
-import { Icon } from './components/Icon.jsx';
-import { BlobShape } from './components/BlobShape.jsx';
-import { DayStrip } from './components/DayStrip.jsx';
-import { TimelineRow } from './components/TimelineRow.jsx';
-import { InlineQuickAdd } from './components/InlineQuickAdd.jsx';
-import { DaySummary } from './components/DaySummary.jsx';
-import { InsightsScreen } from './components/InsightsScreen.jsx';
-import { LogMealSheet } from './sheets/LogMealSheet.jsx';
-import { LogGutSheet } from './sheets/LogGutSheet.jsx';
-import { SnackEditSheet } from './sheets/SnackEditSheet.jsx';
-import { TODAY, addDays, dayKey, relativeDay } from './data.js';
-import { db, storage, auth } from './config/firebase.js';
+import {useCallback, useMemo, useState} from 'react';
+import {addDoc, collection, deleteDoc, doc, serverTimestamp, updateDoc} from 'firebase/firestore';
+import {deleteObject, getDownloadURL, ref as storageRef, uploadBytes} from 'firebase/storage';
+import {useAuth} from './auth/AuthContext.jsx';
+import {useAllEntries} from './hooks/useEntries.js';
+import {Icon} from './components/Icon.jsx';
+import {BlobShape} from './components/BlobShape.jsx';
+import {DayStrip} from './components/DayStrip.jsx';
+import {TimelineRow} from './components/TimelineRow.jsx';
+import {InlineQuickAdd} from './components/InlineQuickAdd.jsx';
+import {DaySummary} from './components/DaySummary.jsx';
+import {InsightsScreen} from './components/InsightsScreen.jsx';
+import {LogMealSheet} from './sheets/LogMealSheet.jsx';
+import {LogGutSheet} from './sheets/LogGutSheet.jsx';
+import {SnackEditSheet} from './sheets/SnackEditSheet.jsx';
+import {addDays, dayKey, relativeDay, TODAY} from './data.js';
+import {db, storage} from './config/firebase.js';
 
 function computeSlotTime(dayEntries, afterIndex) {
   const cur = dayEntries[afterIndex];
@@ -68,6 +67,15 @@ export function App() {
     const s = new Set();
     entries.filter(e => e.type === 'meal').forEach(e => (e.ingredients || []).forEach(i => s.add(i)));
     return [...s];
+  }, [entries]);
+
+  const snackHistory = useMemo(() => {
+    const counts = {};
+    entries.filter(e => e.type === 'snack').forEach(e => {
+      const key = e.item.toLowerCase();
+      counts[key] = (counts[key] || 0) + (e.count || 1);
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([item]) => item);
   }, [entries]);
 
   const entriesRef = () => collection(db, 'users', uid, 'entries');
@@ -271,7 +279,10 @@ export function App() {
                       <div style={{ fontSize: 13, marginTop: 4 }}>Use the buttons above to start logging.</div>
                       <div style={{ marginTop: 16 }}>
                         <InlineQuickAdd open={openSlot === 'empty'} onToggle={() => setOpenSlot(openSlot === 'empty' ? null : 'empty')}
-                          onPick={(snack) => { addSnack(snack); setOpenSlot(null); }} snackCounts={snackCounts} />
+                                        onPick={(snack) => {
+                                          addSnack(snack);
+                                          setOpenSlot(null);
+                                        }} snackCounts={snackCounts} history={snackHistory}/>
                       </div>
                     </div>
                   ) : (
@@ -304,6 +315,7 @@ export function App() {
                                   setOpenSlot(null);
                                 }}
                                 snackCounts={snackCounts}
+                                history={snackHistory}
                               />
                             )}
                           </div>
