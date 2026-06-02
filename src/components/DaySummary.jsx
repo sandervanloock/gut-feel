@@ -1,4 +1,9 @@
-import { BlobShape } from './BlobShape.jsx';
+import {BlobShape} from './BlobShape.jsx';
+
+const VIT_NAME = {
+    c: 'Vitamin C', d: 'Vitamin D', b12: 'B12', iron: 'Iron',
+    calcium: 'Calcium', potassium: 'Potassium', magnesium: 'Magnesium',
+};
 
 function gutSummary(meals, bowels, avg) {
   if (meals === 0 && bowels === 0) return 'A blank day. Log your first bite below.';
@@ -8,28 +13,119 @@ function gutSummary(meals, bowels, avg) {
   return 'Things are running a touch loose.';
 }
 
+function aggregateDayNutrition(dayEntries) {
+    const meals = dayEntries.filter(e => e.type === 'meal');
+    let analysed = 0, pending = 0;
+    let kcal = 0;
+    const macros = {protein: 0, carbs: 0, fat: 0};
+    let estimate = false;
+
+    meals.forEach(m => {
+        const a = m.analysis;
+        if (!a || a.status === 'pending' || !a.nutrition) {
+            pending++;
+            return;
+        }
+        analysed++;
+        const n = a.nutrition;
+        const dropped = a.dropped || [];
+        const has = (k) => !dropped.includes(k);
+        if (has('calories')) kcal += n.kcal;
+        if (has('protein')) macros.protein += n.macros.protein;
+        if (has('carbs')) macros.carbs += n.macros.carbs;
+        if (has('fat')) macros.fat += n.macros.fat;
+        if (a.status === 'needs-input' || (n.conf && n.conf.calories === 'low')) estimate = true;
+    });
+
+    return {totalMeals: meals.length, analysed, pending, kcal, macros, estimate};
+}
+
 export function DaySummary({ entries, metaphor }) {
-  const meals = entries.filter(e => e.type === 'meal').length;
   const bowel = entries.filter(e => e.type === 'bowel');
-  const avgBristol = bowel.length ? (bowel.reduce((s, e) => s + e.bristol, 0) / bowel.length) : null;
+    const avgBristol = bowel.length
+        ? bowel.reduce((s, e) => s + e.bristol, 0) / bowel.length
+        : null;
+
+    const agg = aggregateDayNutrition(entries);
+    const hasNutrition = agg.analysed > 0;
+
+    const mc = {
+        protein: agg.macros.protein * 4,
+        carbs: agg.macros.carbs * 4,
+        fat: agg.macros.fat * 9,
+    };
+    const mcTotal = Math.max(mc.protein + mc.carbs + mc.fat, 1);
+    const macroMeta = [
+        {key: 'protein', label: 'Protein', g: agg.macros.protein, color: 'var(--macro-p)'},
+        {key: 'carbs', label: 'Carbs', g: agg.macros.carbs, color: 'var(--macro-c)'},
+        {key: 'fat', label: 'Fat', g: agg.macros.fat, color: 'var(--macro-f)'},
+    ];
+
+    let calSub;
+    if (!hasNutrition) {
+        calSub = agg.totalMeals === 0 ? 'No meals logged yet.' : 'Nutrition still being tagged…';
+    } else {
+        const mealWord = agg.analysed === 1 ? 'meal' : 'meals';
+        calSub = `across ${agg.analysed} ${mealWord}`;
+        if (agg.pending > 0) calSub += ` · ${agg.pending} still tagging`;
+    }
 
   return (
     <div style={{ padding: '14px 20px 24px' }}>
-      <div className="card today-summary-card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ flex: 1 }}>
-          <div className="eyebrow" style={{ marginBottom: 4 }}>Today's gut</div>
-          <div style={{ fontFamily: 'var(--serif)', fontSize: 20, lineHeight: 1.15, letterSpacing: '-0.01em' }}>
-            {gutSummary(meals, bowel.length, avgBristol)}
-          </div>
-        </div>
-        {avgBristol && (
-          <div style={{ textAlign: 'center', flexShrink: 0 }}>
-            <BlobShape n={Math.round(avgBristol)} size={48} metaphor={metaphor} />
-            <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'var(--mono)', marginTop: 2, letterSpacing: '0.04em' }}>
-              AVG · {avgBristol.toFixed(1)}
+        <div className="card today-summary-card gut-card">
+            {/* Calories hero */}
+            <div className="gut-cal-block">
+                <div className="eyebrow">Today's gut</div>
+                {hasNutrition ? (
+                    <>
+                        <div className="gut-cal-row">
+                            <span className="gut-cal-num">{agg.estimate ? '≈ ' : ''}{agg.kcal.toLocaleString()}</span>
+                            <span className="gut-cal-unit">kcal</span>
+                        </div>
+                        <div className="gut-cal-sub">{calSub}</div>
+                    </>
+                ) : (
+                    <div className="gut-cal-empty">{calSub}</div>
+                )}
             </div>
-          </div>
-        )}
+
+            {/* Macro split */}
+            {hasNutrition && (
+                <div className="gut-macros">
+                    <div className="gut-macro-bar">
+                        {macroMeta.map(m => (
+                            <i key={m.key} style={{width: (mc[m.key] / mcTotal * 100) + '%', background: m.color}}/>
+                        ))}
+                    </div>
+                    <div className="gut-macro-legend">
+                        {macroMeta.map(m => (
+                            <div key={m.key} className="gut-macro-item">
+                                <span className="gut-macro-dot" style={{background: m.color}}/>
+                                <span className="gut-macro-name">{m.label}</span>
+                                <span className="gut-macro-g">{m.g}<span className="gut-macro-u">g</span></span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Gut output footer */}
+            <div className="gut-output">
+                {avgBristol ? (
+                    <>
+                        <BlobShape n={Math.round(avgBristol)} size={40} metaphor={metaphor}/>
+                        <div className="gut-output-text">
+                            <div className="gut-output-line">{gutSummary(0, bowel.length, avgBristol)}</div>
+                            <div className="gut-output-meta">
+                                {bowel.length} {bowel.length === 1 ? 'movement' : 'movements'} ·
+                                Type {avgBristol.toFixed(1)} avg
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="gut-output-meta gut-output-none">No gut output logged yet.</div>
+                )}
+            </div>
       </div>
     </div>
   );

@@ -578,11 +578,11 @@ input, textarea { font: inherit; color: inherit; }
   .today-side .today-summary-card {
     position: sticky;
     top: 24px;
-    padding: 22px !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 18px !important;
     text-align: left;
+  }
+
+  .today-side .gut-card {
+    padding: 22px !important;
   }
 
   /* Insights page — header full width, cards in 12-col grid */
@@ -649,6 +649,149 @@ input, textarea { font: inherit; color: inherit; }
   body { background: oklch(97% 0.005 75); }
 }
 
+
+/* ── Today's gut — combined nutrition + output summary card ── */
+.gut-card {
+  padding: 18px !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+.gut-cal-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.gut-cal-block .eyebrow {
+  margin-bottom: 8px;
+}
+
+.gut-cal-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.gut-cal-num {
+  font-family: var(--serif);
+  font-size: 42px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.gut-cal-unit {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.gut-cal-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.gut-cal-empty {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+  margin-top: 2px;
+}
+
+.gut-macros {
+  margin-top: 16px;
+}
+
+.gut-macro-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-2);
+  gap: 2px;
+}
+
+.gut-macro-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  min-width: 2px;
+}
+
+.gut-macro-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.gut-macro-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gut-macro-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.gut-macro-name {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gut-macro-g {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.gut-macro-u {
+  color: var(--faint);
+  margin-left: 1px;
+}
+
+.gut-output {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 0.5px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gut-output-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.gut-output-line {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.gut-output-meta {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+
+.gut-output-none {
+  margin-top: 0;
+}
 
 /* ── AI nutrition layer ─────────────────────────────────── */
 
