@@ -171,6 +171,15 @@ const MEALS = [
     },
 ];
 
+const ACTIVITIES = [
+    {activityType: 'Run', durationMinutes: 32, caloriesBurned: 310, distanceMeters: 5200},
+    {activityType: 'Run', durationMinutes: 45, caloriesBurned: 420, distanceMeters: 7500},
+    {activityType: 'Ride', durationMinutes: 48, caloriesBurned: 480, distanceMeters: 18000},
+    {activityType: 'Strength', durationMinutes: 45, caloriesBurned: 280, distanceMeters: null},
+    {activityType: 'Walk', durationMinutes: 35, caloriesBurned: 180, distanceMeters: 3200},
+    {activityType: 'Yoga', durationMinutes: 40, caloriesBurned: 120, distanceMeters: null},
+];
+
 const NOTES_POOL = [
     'Felt good after this.',
     'A bit heavy, could eat less next time.',
@@ -238,6 +247,27 @@ async function seed() {
                 photoUrl: null,
                 analysis: meal.analysis ?? null,
                 analysisRequestedAt: now(),
+                createdAt: now(),
+                updatedAt: now(),
+            });
+            count++;
+        }
+
+        // ~40% chance of an activity
+        if (Math.random() > 0.6) {
+            const act = pick(ACTIVITIES);
+            const ref = col.doc();
+            batch.set(ref, {
+                type: 'activity',
+                date,
+                time: pick(['06:30', '07:00', '07:30', '08:00', '17:00', '18:00']),
+                activityType: act.activityType,
+                durationMinutes: act.durationMinutes,
+                caloriesBurned: act.caloriesBurned,
+                distanceMeters: act.distanceMeters,
+                source: 'Garmin',
+                sourceId: `seed-${date}-${Math.random().toString(36).slice(2, 8)}`,
+                syncedAt: now(),
                 createdAt: now(),
                 updatedAt: now(),
             });

@@ -1,4 +1,5 @@
 import {BlobShape} from './BlobShape.jsx';
+import {Icon} from './Icon.jsx';
 
 const VIT_NAME = {
     c: 'Vitamin C', d: 'Vitamin D', b12: 'B12', iron: 'Iron',
@@ -41,6 +42,11 @@ function aggregateDayNutrition(dayEntries) {
 }
 
 export function DaySummary({ entries, metaphor }) {
+    const activities = entries.filter(e => e.type === 'activity');
+    const burned = activities.reduce((s, a) => s + (a.caloriesBurned || 0), 0);
+    const activeMin = activities.reduce((s, a) => s + (a.durationMinutes || 0), 0);
+    const actTypes = [...new Set(activities.map(a => a.activityType).filter(Boolean))];
+
   const bowel = entries.filter(e => e.type === 'bowel');
     const avgBristol = bowel.length
         ? bowel.reduce((s, e) => s + e.bristol, 0) / bowel.length
@@ -83,6 +89,25 @@ export function DaySummary({ entries, metaphor }) {
                             <span className="gut-cal-unit">kcal</span>
                         </div>
                         <div className="gut-cal-sub">{calSub}</div>
+                        {burned > 0 && (
+                            <div className="gut-energy">
+                                <div className="gut-energy-cell">
+                                    <span className="gut-energy-num">{agg.kcal.toLocaleString()}</span>
+                                    <span className="gut-energy-lbl">in</span>
+                                </div>
+                                <span className="gut-energy-op">−</span>
+                                <div className="gut-energy-cell">
+                                    <span className="gut-energy-num">{burned.toLocaleString()}</span>
+                                    <span className="gut-energy-lbl">burned</span>
+                                </div>
+                                <span className="gut-energy-op">=</span>
+                                <div className="gut-energy-cell">
+                                    <span
+                                        className="gut-energy-num gut-energy-net">{(agg.kcal - burned).toLocaleString()}</span>
+                                    <span className="gut-energy-lbl">net</span>
+                                </div>
+                            </div>
+                        )}
                     </>
                 ) : (
                     <div className="gut-cal-empty">{calSub}</div>
@@ -105,6 +130,25 @@ export function DaySummary({ entries, metaphor }) {
                                 <span className="gut-macro-g">{m.g}<span className="gut-macro-u">g</span></span>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Activity footer */}
+            {activities.length > 0 && (
+                <div className="gut-activity">
+                    <div className="gut-act-icon">
+                        <Icon name="activity" size={20} color="var(--move-ink)"/>
+                    </div>
+                    <div className="gut-output-text">
+                        <div className="gut-output-line">
+                            {burned > 0 ? `≈${burned.toLocaleString()} kcal burned` : `${activeMin} min active`}
+                        </div>
+                        <div className="gut-output-meta">
+                            {activeMin} min active
+                            · {activities.length} {activities.length === 1 ? 'session' : 'sessions'}
+                            {actTypes.length > 0 ? ' · ' + actTypes.join(', ').toLowerCase() : ''}
+                        </div>
                     </div>
                 </div>
             )}

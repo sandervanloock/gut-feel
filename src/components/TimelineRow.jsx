@@ -142,5 +142,52 @@ export function TimelineRow({ entry, metaphor, onEdit, onIncrementSnack, dragHan
     );
   }
 
+    if (entry.type === 'activity') {
+        return (
+            <div style={baseStyle} {...rowDnd}>
+                {showDropTop && dropLine(true)}
+                {showDropBot && dropLine(false)}
+                <div style={{...dotStyle, background: 'var(--move)', borderColor: 'var(--move)'}}/>
+                <div className="card act-card" style={{padding: 14, display: 'flex', alignItems: 'center', gap: 12}}>
+                    <div className="act-glyph">
+                        <Icon name="activity" size={22} color="var(--move-ink)"/>
+                    </div>
+                    <div style={{flex: 1, minWidth: 0}}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap'}}>
+                            <div className="eyebrow" style={{whiteSpace: 'nowrap', flexShrink: 0}}>Activity
+                                · {fmtTime(entry.time)}</div>
+                            {entry.source && (
+                                <span className="act-synced">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                       strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>
+                  </svg>
+                                    {entry.source}
+                </span>
+                            )}
+                        </div>
+                        <div style={{
+                            fontFamily: 'var(--serif)',
+                            fontSize: 18,
+                            letterSpacing: '-0.01em',
+                            marginTop: 2
+                        }}>{entry.activityType}</div>
+                        <div style={{fontSize: 12, color: 'var(--muted)', marginTop: 2, fontFamily: 'var(--mono)'}}>
+                            {entry.durationMinutes} min
+                            {entry.distanceMeters ? ` · ${(entry.distanceMeters / 1000).toFixed(1)} km` : ''}
+                        </div>
+                    </div>
+                    {entry.caloriesBurned > 0 && (
+                        <div className="act-burn">
+                            <span className="act-burn-num">−{entry.caloriesBurned.toLocaleString()}</span>
+                            <span className="act-burn-unit">kcal</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
   return null;
 }

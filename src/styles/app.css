@@ -1323,6 +1323,134 @@ input, textarea { font: inherit; color: inherit; }
   flex-shrink: 0;
 }
 
+/* ── Activity entries (synced from Garmin) ───────────────── */
+.act-card {
+    border-color: color-mix(in oklab, var(--move), transparent 80%) !important;
+    background: color-mix(in oklab, var(--move-soft), var(--surface) 35%);
+}
+
+.act-glyph {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 0.5px solid color-mix(in oklab, var(--move), transparent 72%);
+}
+
+.act-synced {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px 2px 6px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--move), transparent 86%);
+    color: var(--move-ink);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.act-burn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.act-burn-num {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--move-ink);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.act-burn-unit {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+/* Energy balance strip in Today's gut */
+.gut-energy {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 11px 12px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    border: 0.5px solid var(--line-2);
+}
+
+.gut-energy-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+}
+
+.gut-energy-num {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+.gut-energy-net {
+    color: var(--move-ink);
+}
+
+.gut-energy-lbl {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.gut-energy-op {
+    display: flex;
+    align-items: center;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 14px;
+}
+
+/* Activity footer in Today's gut */
+.gut-activity {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 0.5px solid var(--line-2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gut-act-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--move-soft);
+    border: 0.5px solid color-mix(in oklab, var(--move), transparent 78%);
+}
+
 .mstrip-kcal {
   font-family: var(--mono);
   font-size: 12px;

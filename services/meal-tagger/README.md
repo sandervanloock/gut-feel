@@ -14,11 +14,35 @@ Non-meal entries and unchanged meals (hash match + status `ready`) are skipped.
 
 ## Environment variables
 
-| Variable         | Description                                |
-|------------------|--------------------------------------------|
-| `GEMINI_API_KEY` | Gemini API key (set as a Cloud Run secret) |
+| Variable         | Source                            | Description    |
+|------------------|-----------------------------------|----------------|
+| `GEMINI_API_KEY` | Secret Manager (`GEMINI_API_KEY`) | Gemini API key |
 
 Firebase Admin SDK uses Application Default Credentials — no explicit key needed on Cloud Run.
+
+## Secret Manager setup
+
+Create the secret (run once):
+
+```bash
+echo -n "your-api-key" | gcloud secrets create GEMINI_API_KEY \
+  --data-file=- \
+  --replication-policy=automatic
+```
+
+Grant the service account access:
+
+```bash
+gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
+  --member="serviceAccount:meal-tagger-sa@gut-feel-sandervl.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+To rotate the key later:
+
+```bash
+echo -n "new-api-key" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
+```
 
 ## Deploy
 
@@ -26,7 +50,7 @@ Firebase Admin SDK uses Application Default Credentials — no explicit key need
 gcloud run deploy meal-tagger \
   --source . \
   --region europe-west1 \
-  --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
+  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest \
   --no-allow-unauthenticated
 ```
 

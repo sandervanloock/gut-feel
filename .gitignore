@@ -4,3 +4,4 @@
 .env.local
 *.iml
 .env.*
+/services/garmin-sync/.env

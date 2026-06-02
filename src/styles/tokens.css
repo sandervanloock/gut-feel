@@ -23,6 +23,11 @@
   --sand: oklch(88% 0.035 80);
   --amber: oklch(72% 0.12 75);
 
+    /* Activity / movement — synced from Garmin */
+    --move: oklch(60% 0.085 265);
+    --move-soft: oklch(93% 0.04 265);
+    --move-ink: oklch(48% 0.09 265);
+
   /* AI / nutrition layer */
   --ai: var(--sage);
   --ai-soft: var(--sage-soft);

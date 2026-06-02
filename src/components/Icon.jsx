@@ -24,6 +24,10 @@ export function Icon({ name, size = 22, color = 'currentColor', strokeWidth = 1.
     case 'sparkle':   return <svg {...p}><path d="M12 4l1.5 4.5L18 10l-4.5 1.5L12 16l-1.5-4.5L6 10l4.5-1.5z"/></svg>;
     case 'history':   return <svg {...p}><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/><polyline points="12 7 12 12 15 14"/></svg>;
     case 'note':      return <svg {...p}><path d="M5 4h14v16H5z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>;
+      case 'activity':
+          return <svg {...p}>
+              <polyline points="3 12 6 12 8 5 11 19 13 9 15 14 17 14 21 14"/>
+          </svg>;
     case 'dots':      return <svg {...p}><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg>;
     case 'spinner':   return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ animation: 'spin 0.7s linear infinite' }}>
