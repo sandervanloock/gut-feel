@@ -107,15 +107,21 @@ export function App() {
     };
 
     if (mealSheet.initial) {
-      const prevAnalysis = mealSheet.initial.analysis ?? {};
+      const prev = mealSheet.initial;
+      const prevAnalysis = prev.analysis ?? {};
+      const nameChanged = name !== prev.name;
+      const ingredientsChanged = JSON.stringify([...ingredients].sort()) !== JSON.stringify([...(prev.ingredients ?? [])].sort());
+      const needsReanalysis = nameChanged || ingredientsChanged;
       await updateDoc(doc(db, 'users', uid, 'entries', mealSheet.initial.id), {
         ...data,
-        analysis: {
-          ...pendingAnalysis,
-          followupAnswers: prevAnalysis.followupAnswers ?? {},
-          dropped: prevAnalysis.dropped ?? []
-        },
-        analysisRequestedAt: serverTimestamp(),
+        ...(needsReanalysis ? {
+          analysis: {
+            ...pendingAnalysis,
+            followupAnswers: prevAnalysis.followupAnswers ?? {},
+            dropped: prevAnalysis.dropped ?? [],
+          },
+          analysisRequestedAt: serverTimestamp(),
+        } : {}),
         updatedAt: serverTimestamp(),
       });
     } else {
