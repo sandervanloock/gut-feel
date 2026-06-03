@@ -102,33 +102,43 @@ def sync_garmin_activities(db, uid: str, backfill_days: int = None) -> int:
         if not activity_id or activity_id in existing_ids:
             continue
 
-        # Use UTC date to match how the rest of the app stores dates (UTC-based).
+        # Date: use UTC epoch → UTC date − 1 day (app-wide convention for all entry types).
+        # Time: use startTimeLocal (Garmin local time string) for correct display in the UI.
         begin_ts = act.get("beginTimestamp")
+        start_time_local = act.get("startTimeLocal", "")
+
         if begin_ts:
-            dt = datetime.datetime.fromtimestamp(begin_ts / 1000, tz=datetime.timezone.utc)
-        else:
-            start_time_local = act.get("startTimeLocal", "")
-            if not start_time_local:
-                continue
+            dt_utc = datetime.datetime.fromtimestamp(begin_ts / 1000, tz=datetime.timezone.utc)
+            date_str = (dt_utc.date() - datetime.timedelta(days=1)).isoformat()
+        elif start_time_local:
             try:
-                dt = datetime.datetime.strptime(start_time_local, "%Y-%m-%d %H:%M:%S").replace(
+                dt_utc = datetime.datetime.strptime(start_time_local, "%Y-%m-%d %H:%M:%S").replace(
                     tzinfo=datetime.timezone.utc
                 )
+                date_str = (dt_utc.date() - datetime.timedelta(days=1)).isoformat()
             except ValueError:
                 print(f"skip {activity_id}: unexpected startTimeLocal format: {start_time_local}")
                 continue
+        else:
+            continue
+
+        # Parse local time for the time field (HH:MM shown on the timeline).
+        if start_time_local:
+            try:
+                time_str = datetime.datetime.strptime(start_time_local, "%Y-%m-%d %H:%M:%S").strftime("%H:%M")
+            except ValueError:
+                time_str = dt_utc.strftime("%H:%M")
+        else:
+            time_str = dt_utc.strftime("%H:%M")
 
         distance = act.get("distance")
         calories = int(act.get("calories", 0)) or None
         duration_seconds = act.get("duration", 0)
 
-        # The app stores date as UTC date minus 1 day (existing convention for all entry types).
-        date_str = (dt.date() - datetime.timedelta(days=1)).isoformat()
-
         entry = {
             "type": "activity",
             "date": date_str,
-            "time": dt.strftime("%H:%M"),
+            "time": time_str,
             "activityType": _map_activity_type(act.get("activityType", {}).get("typeKey", "")),
             "durationMinutes": round(duration_seconds / 60) if duration_seconds else 0,
             "caloriesBurned": calories,
